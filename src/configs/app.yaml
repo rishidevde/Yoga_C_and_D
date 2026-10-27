@@ -1,0 +1,28 @@
+# Application settings
+camera:
+  device_index: 0
+  width: 640
+  height: 480
+  fps: 30
+
+model:
+  path: "models/pose_landmarker_lite.task"
+  min_detection_confidence: 0.5
+  min_tracking_confidence: 0.5
+  running_mode: "LIVE_STREAM"
+
+ui:
+  window_name: "Yoga Pose Correction"
+  display_width: 1280
+  display_height: 720
+  mirror_display: true
+  skeleton_color: [240, 180, 50]     # BGR: Bright cyan/blue
+  ghost_color: [0, 255, 60]          # BGR: Vibrant neon green
+  arrow_color: [0, 140, 255]         # BGR: Radiant orange
+  font_scale: 0.8
+  line_thickness: 3
+
+correction:
+  hysteresis_fail_frames: 2
+  hysteresis_ok_frames: 6
+  max_corrections_shown: 3

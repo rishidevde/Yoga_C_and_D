@@ -1,0 +1,138 @@
+# =============================================================================
+# Pose Evaluation Rules Configuration
+# =============================================================================
+# Each pose defines:
+#   view: front | side
+#   min_visibility: float (0.0 to 1.0)
+#   hold_seconds: float (required hold time for "aligned" status)
+#   rules: list of rules evaluated each frame
+#
+# Rule fields:
+#   name: identifier string
+#   kind: angle | axis_angle | depth_diff | ratio
+#   joints: list of landmark names (vertex is the middle element for angles)
+#   target: desired value in degrees (or meters/ratio)
+#   tol: allowable tolerance (+/-)
+#   weight: relative priority weight for ranking (default 1.0)
+#   safety: true if violation could risk injury (always prioritized)
+#   cue_low: instruction displayed when measured < target
+#   cue_high: instruction displayed when measured > target
+#   hint_axis: [x, y, z] fallback rotation axis for collinear limbs
+# =============================================================================
+
+triangle:
+  name: "Triangle Pose (Trikonasana)"
+  view: front
+  min_visibility: 0.5
+  hold_seconds: 3.0
+  rules:
+    - name: front_knee_straight
+      kind: angle
+      joints: [left_hip, left_knee, left_ankle]
+      target: 175.0
+      tol: 12.0
+      weight: 1.0
+      safety: true
+      cue_low: "Straighten your front knee"
+      cue_high: "Do not hyperextend your front knee"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: back_knee_straight
+      kind: angle
+      joints: [right_hip, right_knee, right_ankle]
+      target: 175.0
+      tol: 12.0
+      weight: 0.9
+      safety: true
+      cue_low: "Keep your back leg straight and strong"
+      cue_high: "Do not hyperextend your back knee"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: top_arm_vertical
+      kind: angle
+      joints: [left_shoulder, right_shoulder, right_wrist]
+      target: 170.0
+      tol: 15.0
+      weight: 0.9
+      safety: false
+      cue_low: "Reach your top arm straight up toward ceiling"
+      cue_high: "Align your top arm with your shoulders"
+      hint_axis: [0.0, 1.0, 0.0]
+
+    - name: bottom_arm_alignment
+      kind: angle
+      joints: [right_shoulder, left_shoulder, left_wrist]
+      target: 170.0
+      tol: 15.0
+      weight: 0.8
+      safety: false
+      cue_low: "Extend your bottom hand down toward shin"
+      cue_high: "Keep bottom arm aligned with chest"
+      hint_axis: [0.0, 1.0, 0.0]
+
+    - name: torso_lateral_bend
+      kind: angle
+      joints: [left_shoulder, left_hip, left_knee]
+      target: 140.0
+      tol: 20.0
+      weight: 0.7
+      safety: false
+      cue_low: "Lean your torso further sideways — reach longer through your top arm"
+      cue_high: "Stand taller from the hip — reduce the side bend"
+      hint_axis: [0.0, 0.0, 1.0]
+
+bhujangasana:
+  name: "Cobra Pose (Bhujangasana)"
+  view: side
+  min_visibility: 0.4
+  hold_seconds: 3.0
+  rules:
+    - name: elbows_soft_bend
+      kind: angle
+      joints: [left_shoulder, left_elbow, left_wrist]
+      target: 140.0
+      tol: 20.0
+      weight: 1.0
+      safety: true
+      cue_low: "Do not bend elbows too much; open chest"
+      cue_high: "Keep elbows slightly bent, don't lock arms"
+      hint_axis: [1.0, 0.0, 0.0]
+
+    - name: spine_extension
+      kind: angle
+      joints: [left_ear, left_shoulder, left_hip]
+      target: 150.0
+      tol: 25.0
+      weight: 0.9
+      safety: true
+      cue_low: "Lift your chest forward and up gently"
+      cue_high: "Avoid compressing your lower back"
+      hint_axis: [1.0, 0.0, 0.0]
+
+dhanurasana:
+  name: "Bow Pose (Dhanurasana)"
+  view: side
+  min_visibility: 0.4
+  hold_seconds: 3.0
+  rules:
+    - name: knee_bend_lift
+      kind: angle
+      joints: [left_hip, left_knee, left_ankle]
+      target: 90.0
+      tol: 25.0
+      weight: 1.0
+      safety: true
+      cue_low: "Kick your feet up and back into hands"
+      cue_high: "Keep knees hip-width apart and active"
+      hint_axis: [1.0, 0.0, 0.0]
+
+    - name: chest_lift
+      kind: angle
+      joints: [left_shoulder, left_hip, left_knee]
+      target: 155.0
+      tol: 20.0
+      weight: 0.9
+      safety: false
+      cue_low: "Lift your chest and thighs higher"
+      cue_high: "Maintain smooth breathing and steady hold"
+      hint_axis: [1.0, 0.0, 0.0]
