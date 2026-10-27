@@ -149,3 +149,68 @@ class TestYogaScenarios:
         corrs = planner.plan(errors, lm, 640, 480, apply_hysteresis=False)
         assert len(corrs) == 1
         assert "180° → 90°" in corrs[0].label
+
+    def test_all_dataset_poses_load_and_have_rules(self):
+        """Verify that all 8 dataset poses load successfully from poses.yaml with safety rules."""
+        required_poses = [
+            "triangle",
+            "ardhachandrasana",
+            "baddhakonasana",
+            "downward_dog",
+            "natarajasana",
+            "utkatakonasana",
+            "veerabhadrasana",
+            "vrukshasana",
+        ]
+        for pkey in required_poses:
+            meta, rules = load_pose_rules("configs/poses.yaml", pkey)
+            assert meta["key"] == pkey
+            assert len(rules) >= 3, f"Pose {pkey} should have at least 3 rules"
+            # Ensure each pose has at least one safety rule
+            assert any(r.safety for r in rules), f"Pose {pkey} must contain a safety rule"
+
+    def test_warrior2_bilateral_knee_swap(self):
+        """Warrior II should swap rules when the right knee is bent (right-front) instead of left."""
+        meta, rules = load_pose_rules("configs/poses.yaml", "veerabhadrasana")
+        evaluator = PoseEvaluator(rules=rules, pose_key="veerabhadrasana")
+
+        img = np.zeros((33, 3), dtype=np.float32)
+        world = np.zeros((33, 3), dtype=np.float32)
+        vis = np.ones(33, dtype=np.float32) * 0.95
+
+        # Right knee bent ~90 deg (hip: 24, knee: 26, ankle: 28)
+        world[24] = [0.1, 0.0, 0.0]
+        world[26] = [0.4, 0.0, 0.0]
+        world[28] = [0.4, 0.4, 0.0]
+
+        # Left leg straight ~180 deg (hip: 23, knee: 25, ankle: 27)
+        world[23] = [-0.1, 0.0, 0.0]
+        world[25] = [-0.4, 0.0, 0.0]
+        world[27] = [-0.7, 0.0, 0.0]
+
+        lm = Landmarks(timestamp=0.0, image=img, world=world, visibility=vis)
+
+        # Feed 10 frames to commit hysteresis
+        for _ in range(10):
+            evaluator.evaluate(lm)
+
+        assert evaluator._active_side == "right_bend"
+
+    def test_tree_pose_bilateral_lifted_ankle_swap(self):
+        """Tree pose should swap rules when left ankle is lifted (standing on right leg)."""
+        meta, rules = load_pose_rules("configs/poses.yaml", "vrukshasana")
+        evaluator = PoseEvaluator(rules=rules, pose_key="vrukshasana")
+
+        img = np.zeros((33, 3), dtype=np.float32)
+        world = np.zeros((33, 3), dtype=np.float32)
+        vis = np.ones(33, dtype=np.float32) * 0.95
+
+        # Left ankle (27) lifted high (y=0.4), Right ankle (28) on ground (y=0.9)
+        img[27, 1] = 0.4
+        img[28, 1] = 0.9
+
+        lm = Landmarks(timestamp=0.0, image=img, world=world, visibility=vis)
+        for _ in range(10):
+            evaluator.evaluate(lm)
+
+        assert evaluator._active_side == "right_bend"

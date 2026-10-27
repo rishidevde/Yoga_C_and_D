@@ -170,7 +170,7 @@ class CorrectionPlanner:
             # For torso/bend rules the 3-joint chain (shoulder→hip→knee) renders
             # as a confusing body-size triangle, so we only show the pivot→distal
             # segment (hip→target_knee) which clearly communicates "tilt from hip".
-            is_torso_rule = "torso" in rule.name or "bend" in rule.name
+            is_torso_rule = any(k in rule.name.lower() for k in ["torso", "bend", "spine", "chest"])
             if is_torso_rule:
                 target_chain = [b_px, ghost_px]   # pivot → target endpoint only
                 actual_chain = [b_px, c_px]        # pivot → actual endpoint only

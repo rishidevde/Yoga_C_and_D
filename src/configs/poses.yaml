@@ -2,6 +2,7 @@
 # Pose Evaluation Rules Configuration
 # =============================================================================
 # Each pose defines:
+#   name: Full pose title with Sanskrit & English name
 #   view: front | side
 #   min_visibility: float (0.0 to 1.0)
 #   hold_seconds: float (required hold time for "aligned" status)
@@ -30,7 +31,7 @@ triangle:
       kind: angle
       joints: [left_hip, left_knee, left_ankle]
       target: 175.0
-      tol: 12.0
+      tol: 15.0
       weight: 1.0
       safety: true
       cue_low: "Straighten your front knee"
@@ -41,7 +42,7 @@ triangle:
       kind: angle
       joints: [right_hip, right_knee, right_ankle]
       target: 175.0
-      tol: 12.0
+      tol: 15.0
       weight: 0.9
       safety: true
       cue_low: "Keep your back leg straight and strong"
@@ -52,7 +53,7 @@ triangle:
       kind: angle
       joints: [left_shoulder, right_shoulder, right_wrist]
       target: 170.0
-      tol: 15.0
+      tol: 20.0
       weight: 0.9
       safety: false
       cue_low: "Reach your top arm straight up toward ceiling"
@@ -63,7 +64,7 @@ triangle:
       kind: angle
       joints: [right_shoulder, left_shoulder, left_wrist]
       target: 170.0
-      tol: 15.0
+      tol: 20.0
       weight: 0.8
       safety: false
       cue_low: "Extend your bottom hand down toward shin"
@@ -73,12 +74,384 @@ triangle:
     - name: torso_lateral_bend
       kind: angle
       joints: [left_shoulder, left_hip, left_knee]
-      target: 140.0
-      tol: 20.0
+      target: 60.0
+      tol: 22.0
       weight: 0.7
       safety: false
-      cue_low: "Lean your torso further sideways — reach longer through your top arm"
-      cue_high: "Stand taller from the hip — reduce the side bend"
+      cue_low: "Hinge further sideways from front hip crease"
+      cue_high: "Stand taller from hip — reduce the side bend"
+      hint_axis: [0.0, 0.0, 1.0]
+
+ardhachandrasana:
+  name: "Half Moon Pose (Ardha Chandrasana)"
+  view: front
+  min_visibility: 0.45
+  hold_seconds: 3.0
+  rules:
+    - name: standing_knee_straight
+      kind: angle
+      joints: [left_hip, left_knee, left_ankle]
+      target: 175.0
+      tol: 16.0
+      weight: 1.0
+      safety: true
+      cue_low: "Straighten your standing leg firmly"
+      cue_high: "Do not hyperextend your standing knee"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: lifted_leg_straight
+      kind: angle
+      joints: [right_hip, right_knee, right_ankle]
+      target: 175.0
+      tol: 18.0
+      weight: 0.9
+      safety: false
+      cue_low: "Extend your lifted leg straight through the heel"
+      cue_high: "Keep lifted leg active and parallel to floor"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: top_arm_vertical
+      kind: angle
+      joints: [left_shoulder, right_shoulder, right_wrist]
+      target: 170.0
+      tol: 20.0
+      weight: 0.9
+      safety: false
+      cue_low: "Reach your top arm straight up toward ceiling"
+      cue_high: "Stack your top shoulder directly above bottom shoulder"
+      hint_axis: [0.0, 1.0, 0.0]
+
+    - name: bottom_arm_grounded
+      kind: angle
+      joints: [right_shoulder, left_shoulder, left_wrist]
+      target: 165.0
+      tol: 22.0
+      weight: 0.8
+      safety: false
+      cue_low: "Extend bottom hand toward floor under your shoulder"
+      cue_high: "Keep bottom arm firm and chest open"
+      hint_axis: [0.0, 1.0, 0.0]
+
+    - name: torso_lateral_alignment
+      kind: angle
+      joints: [left_shoulder, left_hip, right_ankle]
+      target: 165.0
+      tol: 25.0
+      weight: 0.7
+      safety: false
+      cue_low: "Lift back leg to hip height, lengthening through spine"
+      cue_high: "Maintain a straight horizontal line from head to lifted heel"
+      hint_axis: [0.0, 0.0, 1.0]
+
+baddhakonasana:
+  name: "Bound Angle Pose (Baddha Konasana)"
+  view: front
+  min_visibility: 0.4
+  hold_seconds: 3.0
+  rules:
+    - name: left_knee_flexion
+      kind: angle
+      joints: [left_hip, left_knee, left_ankle]
+      target: 35.0
+      tol: 22.0
+      weight: 1.0
+      safety: false
+      cue_low: "Ease left knee outwards comfortably"
+      cue_high: "Draw left heel closer toward your pelvis"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: right_knee_flexion
+      kind: angle
+      joints: [right_hip, right_knee, right_ankle]
+      target: 35.0
+      tol: 22.0
+      weight: 1.0
+      safety: false
+      cue_low: "Ease right knee outwards comfortably"
+      cue_high: "Draw right heel closer toward your pelvis"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: spine_upright
+      kind: angle
+      joints: [left_shoulder, left_hip, left_knee]
+      target: 70.0
+      tol: 22.0
+      weight: 0.9
+      safety: true
+      cue_low: "Sit taller through crown of head; avoid hunching"
+      cue_high: "Hinge forward gently from hips with a flat back"
+      hint_axis: [1.0, 0.0, 0.0]
+
+    - name: shoulders_relaxed
+      kind: angle
+      joints: [left_elbow, left_shoulder, left_hip]
+      target: 10.0
+      tol: 18.0
+      weight: 0.7
+      safety: false
+      cue_low: "Keep arms resting naturally alongside torso"
+      cue_high: "Relax shoulders away from your ears and lower arms"
+      hint_axis: [0.0, 1.0, 0.0]
+
+downward_dog:
+  name: "Downward-Facing Dog (Adho Mukha Svanasana)"
+  view: side
+  min_visibility: 0.4
+  hold_seconds: 3.0
+  rules:
+    - name: knees_straight
+      kind: angle
+      joints: [left_hip, left_knee, left_ankle]
+      target: 175.0
+      tol: 16.0
+      weight: 1.0
+      safety: true
+      cue_low: "Press thighs back to straighten your legs"
+      cue_high: "Do not hyperextend your knees"
+      hint_axis: [1.0, 0.0, 0.0]
+
+    - name: arms_straight
+      kind: angle
+      joints: [left_shoulder, left_elbow, left_wrist]
+      target: 175.0
+      tol: 16.0
+      weight: 1.0
+      safety: true
+      cue_low: "Push the ground away to fully straighten arms"
+      cue_high: "Keep micro-bend in elbows to prevent hyperextension"
+      hint_axis: [1.0, 0.0, 0.0]
+
+    - name: hip_inverted_v
+      kind: angle
+      joints: [left_shoulder, left_hip, left_ankle]
+      target: 68.0
+      tol: 22.0
+      weight: 0.9
+      safety: false
+      cue_low: "Send hips higher toward ceiling to form an inverted V"
+      cue_high: "Press weight back toward feet and lengthen torso"
+      hint_axis: [1.0, 0.0, 0.0]
+
+    - name: shoulder_opening
+      kind: angle
+      joints: [left_wrist, left_shoulder, left_hip]
+      target: 168.0
+      tol: 22.0
+      weight: 0.8
+      safety: false
+      cue_low: "Open shoulders and press chest gently toward thighs"
+      cue_high: "Avoid sinking excessively through shoulders"
+      hint_axis: [1.0, 0.0, 0.0]
+
+natarajasana:
+  name: "Lord of the Dance (Natarajasana)"
+  view: side
+  min_visibility: 0.45
+  hold_seconds: 3.0
+  rules:
+    - name: standing_knee_straight
+      kind: angle
+      joints: [left_hip, left_knee, left_ankle]
+      target: 175.0
+      tol: 16.0
+      weight: 1.0
+      safety: true
+      cue_low: "Straighten your standing leg firmly"
+      cue_high: "Do not hyperextend standing knee"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: lifted_knee_bend
+      kind: angle
+      joints: [right_hip, right_knee, right_ankle]
+      target: 85.0
+      tol: 25.0
+      weight: 0.9
+      safety: false
+      cue_low: "Kick back foot higher and back into hand"
+      cue_high: "Bend lifted knee and lift thigh upward"
+      hint_axis: [1.0, 0.0, 0.0]
+
+    - name: reaching_arm_forward
+      kind: angle
+      joints: [left_hip, left_shoulder, left_wrist]
+      target: 165.0
+      tol: 25.0
+      weight: 0.8
+      safety: false
+      cue_low: "Reach front arm forward and slightly upward"
+      cue_high: "Lower front arm parallel to floor"
+      hint_axis: [1.0, 0.0, 0.0]
+
+    - name: chest_lift_backbend
+      kind: angle
+      joints: [left_shoulder, left_hip, left_knee]
+      target: 145.0
+      tol: 25.0
+      weight: 0.8
+      safety: false
+      cue_low: "Lift chest forward and proud as you kick back"
+      cue_high: "Keep hips square and spine elongated"
+      hint_axis: [1.0, 0.0, 0.0]
+
+utkatakonasana:
+  name: "Goddess Pose (Utkata Konasana)"
+  view: front
+  min_visibility: 0.45
+  hold_seconds: 3.0
+  rules:
+    - name: left_knee_squat
+      kind: angle
+      joints: [left_hip, left_knee, left_ankle]
+      target: 110.0
+      tol: 25.0
+      weight: 1.0
+      safety: true
+      cue_low: "Do not collapse knees inward; press out over toes"
+      cue_high: "Sink hips lower toward knee height"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: right_knee_squat
+      kind: angle
+      joints: [right_hip, right_knee, right_ankle]
+      target: 110.0
+      tol: 25.0
+      weight: 1.0
+      safety: true
+      cue_low: "Do not collapse knees inward; press out over toes"
+      cue_high: "Sink hips lower toward knee height"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: left_arm_cactus
+      kind: angle
+      joints: [left_shoulder, left_elbow, left_wrist]
+      target: 95.0
+      tol: 30.0
+      weight: 0.8
+      safety: false
+      cue_low: "Raise left forearm upright into 90-degree cactus shape"
+      cue_high: "Bend left elbow to 90 degrees with palm forward"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: right_arm_cactus
+      kind: angle
+      joints: [right_shoulder, right_elbow, right_wrist]
+      target: 95.0
+      tol: 30.0
+      weight: 0.8
+      safety: false
+      cue_low: "Raise right forearm upright into 90-degree cactus shape"
+      cue_high: "Bend right elbow to 90 degrees with palm forward"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: torso_vertical
+      kind: angle
+      joints: [left_shoulder, left_hip, left_knee]
+      target: 105.0
+      tol: 22.0
+      weight: 0.8
+      safety: false
+      cue_low: "Stack shoulders directly above hips; avoid forward lean"
+      cue_high: "Keep spine tall, tailbone tucked down"
+      hint_axis: [0.0, 0.0, 1.0]
+
+veerabhadrasana:
+  name: "Warrior II Pose (Virabhadrasana II)"
+  view: front
+  min_visibility: 0.5
+  hold_seconds: 3.0
+  rules:
+    - name: front_knee_bend
+      kind: angle
+      joints: [left_hip, left_knee, left_ankle]
+      target: 110.0
+      tol: 22.0
+      weight: 1.0
+      safety: true
+      cue_low: "Knee collapsing past toes — keep knee stacked above ankle"
+      cue_high: "Bend front knee deeper toward 90 degrees"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: back_knee_straight
+      kind: angle
+      joints: [right_hip, right_knee, right_ankle]
+      target: 175.0
+      tol: 16.0
+      weight: 1.0
+      safety: true
+      cue_low: "Straighten back leg firmly and ground through back foot"
+      cue_high: "Do not hyperextend back knee"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: front_arm_horizontal
+      kind: angle
+      joints: [right_shoulder, left_shoulder, left_wrist]
+      target: 175.0
+      tol: 18.0
+      weight: 0.9
+      safety: false
+      cue_low: "Lift front arm parallel to floor at shoulder height"
+      cue_high: "Lower front arm to shoulder height"
+      hint_axis: [0.0, 1.0, 0.0]
+
+    - name: back_arm_horizontal
+      kind: angle
+      joints: [left_shoulder, right_shoulder, right_wrist]
+      target: 175.0
+      tol: 18.0
+      weight: 0.9
+      safety: false
+      cue_low: "Lift back arm parallel to floor at shoulder height"
+      cue_high: "Lower back arm to shoulder height"
+      hint_axis: [0.0, 1.0, 0.0]
+
+    - name: torso_upright
+      kind: angle
+      joints: [left_shoulder, left_hip, left_knee]
+      target: 105.0
+      tol: 22.0
+      weight: 0.8
+      safety: false
+      cue_low: "Do not lean forward over front thigh; center your torso"
+      cue_high: "Stack shoulders directly over hips"
+      hint_axis: [0.0, 0.0, 1.0]
+
+vrukshasana:
+  name: "Tree Pose (Vrikshasana)"
+  view: front
+  min_visibility: 0.45
+  hold_seconds: 3.0
+  rules:
+    - name: standing_knee_straight
+      kind: angle
+      joints: [left_hip, left_knee, left_ankle]
+      target: 175.0
+      tol: 16.0
+      weight: 1.0
+      safety: true
+      cue_low: "Straighten standing leg and ground through your foot"
+      cue_high: "Do not hyperextend standing knee"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: tree_knee_turnout
+      kind: angle
+      joints: [right_hip, right_knee, right_ankle]
+      target: 55.0
+      tol: 28.0
+      weight: 0.9
+      safety: false
+      cue_low: "Open bent knee outward without twisting pelvis"
+      cue_high: "Place bent foot higher on inner thigh or calf"
+      hint_axis: [0.0, 0.0, 1.0]
+
+    - name: torso_vertical
+      kind: angle
+      joints: [left_shoulder, left_hip, left_knee]
+      target: 175.0
+      tol: 20.0
+      weight: 0.8
+      safety: false
+      cue_low: "Stand tall; do not lean toward the standing hip"
+      cue_high: "Stack shoulders over hips and lengthen spine"
       hint_axis: [0.0, 0.0, 1.0]
 
 bhujangasana:

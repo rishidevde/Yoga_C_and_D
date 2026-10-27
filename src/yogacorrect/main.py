@@ -45,8 +45,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--pose",
         default="triangle",
-        choices=["triangle", "bhujangasana", "dhanurasana"],
-        help="Initial yoga pose to evaluate.",
+        help="Initial yoga pose to evaluate (e.g. triangle, ardhachandrasana, veerabhadrasana, etc.).",
     )
     parser.add_argument(
         "--poses-config",
@@ -271,13 +270,44 @@ def main() -> int:
                 cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, prop)
                 logger.info("Fullscreen toggled: %s", is_fullscreen)
 
-            elif key in (ord("1"), ord("2"), ord("3")):
+            elif key in (
+                ord("1"), ord("2"), ord("3"), ord("4"), ord("5"),
+                ord("6"), ord("7"), ord("8"), ord("9"), ord("0"),
+                ord("n"), ord("p"),
+            ):
+                pose_order = [
+                    "triangle",
+                    "ardhachandrasana",
+                    "baddhakonasana",
+                    "downward_dog",
+                    "natarajasana",
+                    "utkatakonasana",
+                    "veerabhadrasana",
+                    "vrukshasana",
+                    "bhujangasana",
+                    "dhanurasana",
+                ]
                 pose_map = {
                     ord("1"): "triangle",
-                    ord("2"): "bhujangasana",
-                    ord("3"): "dhanurasana",
+                    ord("2"): "ardhachandrasana",
+                    ord("3"): "baddhakonasana",
+                    ord("4"): "downward_dog",
+                    ord("5"): "natarajasana",
+                    ord("6"): "utkatakonasana",
+                    ord("7"): "veerabhadrasana",
+                    ord("8"): "vrukshasana",
+                    ord("9"): "bhujangasana",
+                    ord("0"): "dhanurasana",
                 }
-                new_pose_key = pose_map[key]
+                if key == ord("n"):
+                    curr_idx = pose_order.index(current_pose_key) if current_pose_key in pose_order else -1
+                    new_pose_key = pose_order[(curr_idx + 1) % len(pose_order)]
+                elif key == ord("p"):
+                    curr_idx = pose_order.index(current_pose_key) if current_pose_key in pose_order else 0
+                    new_pose_key = pose_order[(curr_idx - 1) % len(pose_order)]
+                else:
+                    new_pose_key = pose_map[key]
+
                 if new_pose_key != current_pose_key:
                     try:
                         pose_meta, rules = load_pose_rules(poses_config_path, new_pose_key)
@@ -287,6 +317,7 @@ def main() -> int:
                             pose_key=current_pose_key,
                             min_visibility=float(pose_meta.get("min_visibility", 0.5)),
                         )
+                        evaluator.reset_side_detection()
                         planner.reset()
                         aligned_start_time = None
                         is_aligned = False

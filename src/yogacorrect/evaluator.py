@@ -184,6 +184,56 @@ class PoseEvaluator:
             hint_axis=hint,
         )
 
+    def _detect_active_side(self, landmarks: Landmarks) -> Optional[str]:
+        """Detect bilateral active side ('left_bend' or 'right_bend') based on pose anatomy.
+
+        Returns:
+            'right_bend' if the mirrored (right-active) variation is detected,
+            'left_bend' if the standard (left-active) variation is detected,
+            None if in an ambiguous or transitional zone.
+        """
+        # 1. Arm-tilt / Lateral reach poses (Triangle, Half Moon)
+        if self.pose_key in ("triangle", "ardhachandrasana", "ardha_chandrasana"):
+            lwy = landmarks.image[15, 1]  # left wrist y
+            rwy = landmarks.image[16, 1]  # right wrist y
+            wrist_diff = rwy - lwy        # positive -> left wrist higher (bending right)
+            if wrist_diff > 0.15:
+                return "right_bend"
+            elif wrist_diff < -0.15:
+                return "left_bend"
+            return None
+
+        # 2. Asymmetric knee bend poses (Warrior II)
+        if self.pose_key in ("veerabhadrasana", "warrior", "warrior2"):
+            # Left knee: hip(23), knee(25), ankle(27)
+            # Right knee: hip(24), knee(26), ankle(28)
+            lk = angle_deg(landmarks.world[23], landmarks.world[25], landmarks.world[27])
+            rk = angle_deg(landmarks.world[24], landmarks.world[26], landmarks.world[28])
+            if np.isnan(lk) or np.isnan(rk):
+                return None
+            if lk < rk - 20.0:
+                # Left knee is bent to ~90 deg, right leg straight -> standard (left front)
+                return "left_bend"
+            elif rk < lk - 20.0:
+                # Right knee is bent to ~90 deg, left leg straight -> mirrored (right front)
+                return "right_bend"
+            return None
+
+        # 3. Single-leg standing / Lifted leg poses (Tree Pose, Dancer Pose)
+        if self.pose_key in ("vrukshasana", "tree", "natarajasana", "dancer"):
+            lay = landmarks.image[27, 1]  # left ankle y
+            ray = landmarks.image[28, 1]  # right ankle y
+            # Smaller y in image space = higher off the floor
+            if ray < lay - 0.08:
+                # Right ankle is lifted off ground -> standing on left leg (standard)
+                return "left_bend"
+            elif lay < ray - 0.08:
+                # Left ankle is lifted off ground -> standing on right leg (mirrored)
+                return "right_bend"
+            return None
+
+        return None
+
     def evaluate(self, landmarks: Landmarks) -> List[Error]:
         """Evaluate landmarks against active rules.
 
@@ -198,38 +248,30 @@ class PoseEvaluator:
 
         # ---------------------------------------------------------------
         # Adaptive bilateral side detection with hysteresis
-        # Prevents frame-by-frame oscillation when both wrists are near
-        # the same height (e.g. during T-pose preparation).
+        # Works across Triangle, Half Moon, Warrior II, Tree, and Dancer poses.
+        # Prevents frame-by-frame oscillation when limbs are in transitional zones.
         # ---------------------------------------------------------------
         eval_rules = self.rules
-        if self.pose_key == "triangle":
-            lwy = landmarks.image[15, 1]  # left wrist y (normalised; smaller = higher)
-            rwy = landmarks.image[16, 1]  # right wrist y
-            wrist_diff = rwy - lwy        # positive → left wrist is higher (right bend)
+        detected_side = self._detect_active_side(landmarks)
 
-            # Minimum threshold: only update counters when difference is unambiguous
-            MIN_SWAP_THRESHOLD = 0.15
+        if detected_side == "right_bend":
+            self._swap_state_frames += 1
+            self._noswap_state_frames = 0
+        elif detected_side == "left_bend":
+            self._noswap_state_frames += 1
+            self._swap_state_frames = 0
+        # else: ambiguous zone — hold existing side without resetting counters
 
-            if wrist_diff > MIN_SWAP_THRESHOLD:
-                # Left wrist clearly above right → user bending to their RIGHT
-                self._swap_state_frames += 1
-                self._noswap_state_frames = 0
-            elif wrist_diff < -MIN_SWAP_THRESHOLD:
-                # Right wrist clearly above left → user bending to their LEFT
-                self._noswap_state_frames += 1
-                self._swap_state_frames = 0
-            # else: ambiguous zone — hold existing side without resetting counters
+        # Only commit a side switch after SIDE_HYSTERESIS consecutive clear frames
+        SIDE_HYSTERESIS = 8
+        if self._swap_state_frames >= SIDE_HYSTERESIS:
+            self._active_side = "right_bend"
+        elif self._noswap_state_frames >= SIDE_HYSTERESIS:
+            self._active_side = "left_bend"
+        # else: keep _active_side unchanged
 
-            # Only commit a side switch after SIDE_HYSTERESIS consecutive clear frames
-            SIDE_HYSTERESIS = 8
-            if self._swap_state_frames >= SIDE_HYSTERESIS:
-                self._active_side = "right_bend"
-            elif self._noswap_state_frames >= SIDE_HYSTERESIS:
-                self._active_side = "left_bend"
-            # else: keep _active_side unchanged
-
-            if self._active_side == "right_bend":
-                eval_rules = [self._swap_rule_side(r) for r in self.rules]
+        if self._active_side == "right_bend":
+            eval_rules = [self._swap_rule_side(r) for r in self.rules]
 
         for rule in eval_rules:
             # 1. Visibility Gate: Check if all joints required by this rule are visible
